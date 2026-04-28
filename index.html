@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TRPGシナリオ管制室 v0.5.1.1</title>
+  <title>TRPGシナリオ管制室 v0.6</title>
   <style>
     :root {
       --bg: #111318;
@@ -326,6 +326,7 @@
       box-shadow: 0 25px 70px rgba(0,0,0,.55);
     }
     .modal h3 { margin-top: 0; }
+    .done-step { opacity: .78; border-color: rgba(52,211,153,.35); }
     @media (max-width: 900px) {
       .app { grid-template-columns: 1fr; }
       .sidebar {
@@ -352,7 +353,7 @@
         <div class="brand-mark">卓</div>
         <div>
           <h1>TRPGシナリオ管制室</h1>
-          <p>v0.5.1.1 / 入力補助・公開記事強化版</p>
+          <p>v0.6 / 話数パック・進捗管理強化版</p>
         </div>
       </div>
 
@@ -398,8 +399,8 @@
 
 <script>
 (function(){
-  const STORAGE_KEY = 'trpg_scenario_control_room_v051_full';
-  const APP_VERSION = '0.5.1';
+  const STORAGE_KEY = 'trpg_scenario_control_room_v06_full';
+  const APP_VERSION = '0.6';
   let state = loadState();
   let activeTab = 'dashboard';
   let currentGeneratedText = '';
@@ -432,31 +433,31 @@
       "projects": [
             {
                   "id": "project_normal_campaign_v05",
-                  "title": "通常キャンペーン制作テンプレート v0.5.1",
+                  "title": "通常キャンペーン制作テンプレート v0.6",
                   "system": "ソード・ワールド2.5",
                   "genre": "通常キャンペーン / 工程管理 / 全文登録 / 公開記事強化",
                   "status": "作業中",
-                  "note": "通常キャンペーン用プロンプトをv0.5.1工程表で再整理したテンプレートです。生成入力欄の例示、生成プロンプトの即時コピー、ワールド/キャンペーンNPC紹介文、キャンペーン紹介記事へのNPC紹介欄を追加しました。",
+                  "note": "通常キャンペーン用プロンプトをv0.6工程表で再整理したテンプレートです。生成入力欄の例示、生成プロンプトの即時コピー、ワールド/キャンペーンNPC紹介文、キャンペーン紹介記事へのNPC紹介欄を追加しました。",
                   "createdAt": "2026-04-29 00:00",
                   "updatedAt": "2026-04-29 00:00",
                   "documents": [
                         {
                               "id": "doc_usage_v05",
-                              "title": "運用メモ：このツールの役割 v0.5.1",
+                              "title": "運用メモ：このツールの役割 v0.6",
                               "category": "運用メモ",
                               "status": "採用稿",
                               "scope": "GM用",
-                              "tags": "運用,工程,プロンプト,v0.5.1",
+                              "tags": "運用,工程,プロンプト,v0.6",
                               "content": "このツールは完成シナリオ本文の保存庫ではなく、プロンプトと工程を迷子にしないための作業台として使う。\n完成物や推敲済み本文は、従来通りメモ帳、ChatGPTプロジェクト、Notion等に保存してよい。\nJSONバックアップは、プロンプト・工程設定が育った時の保険として扱う。\n\n【通常キャンペーン：オープンワールド舞台構築】\n1-1. モチーフ事前リサーチ\n1-2. オープンワールド設定比較\n1-3. オープンワールド世界観マスターデータ化\n1-3-A. 世界観決定稿の資料成形\n1-3-B. 短文排除・重厚文体化\n1-4-A. オープンワールドNPC配置資料作成\n1-4-B. オープンワールド公式NPCマスターデータ化\n1-4-C. オープンワールド公式NPC紹介文作成\n1-7. オープンワールド舞台・NPC紹介記事作成\n1-8. オープンワールド舞台・NPC紹介記事Notion整形\n\n【通常キャンペーン：キャンペーン全体構築】\n2. キャンペーン世界観・裏設定作成\n2-A. キャンペーン世界観資料成形\n2-B. キャンペーン世界観短文排除・重厚文体化\n3-1. キャンペーンNPC配置資料作成\n3-2. 主要NPC一覧資料作成\n3-3. 準主要NPC一覧資料作成\n3-4. キャンペーンNPC資料成形\n3-5. キャンペーンNPC短文排除・重厚文体化\n3-6. キャンペーンNPC公開用紹介文作成\n4-1. 第1話フック作成\n4-2. 最終話フック作成\n4-3. 道中話フック作成\n5. キャンペーン全体プロット作成\n6. キャンペーン全体整合性確認・リファイン\n6-1. キャンペーン名・トレーラー作成\n6-2. キャンペーン紹介記事作成\n6-3. キャンペーン紹介記事レビュー・公開情報チェック\n6-4. キャンペーン紹介記事Notion整形\n\n【通常キャンペーン：各話制作】\n7. 各話詳細プロット作成\n7-R. 各話詳細プロット整合性確認・リファイン\n8-A. シナリオ本文 OP〜起 作成\n8-A-R. OP〜起 整合性確認・リファイン\n8-B. シナリオ本文 承Ⅰ〜承Ⅱ 作成\n8-B-R. 承Ⅰ〜承Ⅱ 整合性確認・リファイン\n8-C. シナリオ本文 転〜ED 作成\n8-C-R. 転〜ED 整合性確認・リファイン\n8-D. シナリオ本文 重厚化・リライト\n9. 背景・NPCイラストプロンプト作成\n10. 依頼書作成\n\n注意：\n・生成入力欄のプレースホルダには、プロンプト本文内の[例]や[ここに〜]の内容を優先表示する。\n・1-7は舞台だけでなく、公開可能なオープンワールド公式NPC紹介も含める。\n・6-2のキャンペーン紹介記事には、公開可能な範囲でNPC紹介欄を含める。初回公開時は、第1話から登場し、今後主軸になる対象のみを扱う。\n・8-Dは表現の重厚化のみ。リライト後の整合性確認工程は作らない。",
                               "updatedAt": "2026-04-29 00:00"
                         },
                         {
                               "id": "doc_resource_map",
-                              "title": "資料番号体系メモ v0.5.1",
+                              "title": "資料番号体系メモ v0.6",
                               "category": "運用メモ",
                               "status": "採用稿",
                               "scope": "GM用",
-                              "tags": "資,資料番号,運用,v0.5.1",
+                              "tags": "資,資料番号,運用,v0.6",
                               "content": "[資]0-1. サンプルシナリオ資料①\n[資]0-2. サンプルシナリオ資料②\n\n[資]1. オープンワールド世界観マスターデータ\n\n[資]2-1. オープンワールドNPC配置資料\n[資]2-2. オープンワールド公式NPCマスターデータ\n\n[資]3. GMPC資料（存在する場合のみ）\n\n[資]4. モチーフ作品リサーチ資料\n\n[資]5. キャンペーン世界観・裏設定資料\n\n[資]6. キャンペーンNPC配置資料\n[資]7. キャンペーン主要NPC一覧資料\n[資]8. キャンペーン準主要NPC一覧資料\n\n[資]9-1. 第1話シナリオ資料\n[資]9-2. 第2話シナリオ資料\n[資]9-3. 第3話シナリオ資料\n以降、話数ごとに増える。\n\n[資]9-X は、工程が進むごとに中身が更新される。\n第X話フック → 第X話詳細プロット → 第X話シナリオ本文 → リライト済み本文、というように、ファイルスロット自体を最新状態へ更新していく運用を想定する。\n\n【注意】\n[資]2-1と[資]2-2は、オープンワールド舞台に常設される公式NPC群のための資料。\n[資]6〜[資]8は、特定キャンペーン専用NPC群のための資料。\n両者を混同しないこと。",
                               "updatedAt": "2026-04-29 00:00"
                         },
@@ -1519,6 +1520,7 @@ function loadState(){
             <div>資料：<strong>${p.documents.length}</strong></div>
             <div>プロンプト：<strong>${p.prompts.length}</strong></div>
             <div>工程：<strong>${done}/${total}</strong> 完了</div>
+            <div class="muted small">各話パック：${p.steps.filter(s => s.episodePack).length ? '生成済み' : '未生成'}</div>
             <div>出力履歴：<strong>${p.outputs.length}</strong></div>
             <div class="muted small">現在候補：${current ? esc(current.title) : 'なし'}</div>
           </div>
@@ -1616,10 +1618,49 @@ function loadState(){
       <div class="grid">
         <div class="card span-12">
           <div class="row" style="justify-content:space-between;">
+            <h3>話数パック生成</h3>
+            <span class="pill">可変話数対応</span>
+          </div>
+          <p class="muted small">
+            キャンペーンの総話数が決まったら、ここで各話制作工程をまとめて生成できます。
+            7話固定ではありません。20話でも、3話でも、話数を入れ直して再生成できます。
+          </p>
+          <div class="form-grid">
+            <div>
+              <label>総話数</label>
+              <input id="episodeTotalInput" type="number" min="1" placeholder="例：7 / 10 / 20。未定なら生成しない">
+            </div>
+            <div>
+              <label>生成方式</label>
+              <select id="episodePackMode">
+                <option value="replace">既存の各話パックを置き換える</option>
+                <option value="append">既存工程の末尾に追加する</option>
+              </select>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="primary" id="generateEpisodePacksBtn">指定話数で各話パックを生成</button>
+            <button class="danger" id="clearEpisodePacksBtn">生成済み各話パックを削除</button>
+          </div>
+          <div class="notice small" style="margin-top:10px;">
+            第1話は第1話用、最終話は最終話用、間の話数は道中話用として生成します。
+            話数が増減した場合は、総話数を変更して「置き換える」で再生成してください。
+          </div>
+        </div>
+
+        <div class="card span-12">
+          <h3>進捗</h3>
+          ${progressOverviewHTML(p)}
+        </div>
+
+        <div class="card span-12">
+          <div class="row" style="justify-content:space-between;">
             <h3>工程管理</h3>
             <button class="primary" data-action="editStep" data-id="">工程を追加</button>
           </div>
-          <p class="muted small">工程は「いつ使うか」、プロンプトは「何を命令するか」です。ここを分けることで、クリティカルレビューを何度でも流用できます。</p>
+          <p class="muted small">
+            工程カードの「完了にする」で進捗カウントが進みます。完了済み工程は「未完了に戻す」で戻せます。
+          </p>
           <div class="stack">
             ${sorted.map(s => stepItemHTML(p, s, true)).join('') || '<div class="muted">工程がありません。</div>'}
           </div>
@@ -1632,15 +1673,27 @@ function loadState(){
     const pr = p.prompts.find(x => x.id === s.promptId);
     const statusClass = s.status === '完了' ? 'ok' : s.status === '保留' ? 'danger' : s.status === '作業中' ? 'warn' : '';
     const docNames = (s.docIds || []).map(id => p.documents.find(d => d.id === id)?.title).filter(Boolean);
+    const doneBtn = s.status === '完了'
+      ? `<button class="warn" data-action="toggleStepDone" data-id="${s.id}">未完了に戻す</button>`
+      : `<button class="good" data-action="toggleStepDone" data-id="${s.id}">完了にする</button>`;
+    const workBtn = s.status === '作業中'
+      ? `<button data-action="setStepStatus" data-status="未着手" data-id="${s.id}">未着手へ</button>`
+      : `<button data-action="setStepStatus" data-status="作業中" data-id="${s.id}">作業中にする</button>`;
+    const episodeLabel = s.episodePack
+      ? `<span class="pill">第${esc(s.episodeNumber)}話 / ${esc(s.episodeKindLabel || s.episodeKind || '')}</span>`
+      : '';
     return `
-      <div class="item">
+      <div class="item ${s.status === '完了' ? 'done-step' : ''}">
         <div class="row" style="justify-content:space-between;">
           <div>
             <div class="item-title">${esc(s.order || 0)}. ${esc(s.title)}</div>
             <span class="pill ${statusClass}">${esc(s.status || '未着手')}</span>
+            ${episodeLabel}
             <span class="pill">使用プロンプト：${esc(pr ? pr.title : '未設定')}</span>
           </div>
           ${controls ? `<div class="row">
+            ${doneBtn}
+            ${workBtn}
             <button data-action="moveStep" data-dir="-1" data-id="${s.id}">↑</button>
             <button data-action="moveStep" data-dir="1" data-id="${s.id}">↓</button>
             <button data-action="editStep" data-id="${s.id}">編集</button>
@@ -1652,6 +1705,154 @@ function loadState(){
         <div class="muted small">メモ：${esc(s.memo || '-')}</div>
       </div>
     `;
+  }
+
+  function progressOverviewHTML(p){
+    const total = p.steps.length;
+    const done = p.steps.filter(s => s.status === '完了').length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const episodeSteps = p.steps.filter(s => s.episodePack);
+    const baseSteps = p.steps.filter(s => !s.episodePack);
+    const baseDone = baseSteps.filter(s => s.status === '完了').length;
+
+    const groups = {};
+    episodeSteps.forEach(s => {
+      const n = Number(s.episodeNumber || 0);
+      if (!groups[n]) groups[n] = [];
+      groups[n].push(s);
+    });
+
+    const groupRows = Object.keys(groups).map(Number).sort((a,b)=>a-b).map(n => {
+      const arr = groups[n];
+      const d = arr.filter(s => s.status === '完了').length;
+      const kind = arr[0]?.episodeKindLabel || arr[0]?.episodeKind || '';
+      const gpct = arr.length ? Math.round(d / arr.length * 100) : 0;
+      return `
+        <div class="item">
+          <div class="row" style="justify-content:space-between;">
+            <strong>第${n}話 ${esc(kind)}</strong>
+            <span class="pill ${gpct === 100 ? 'ok' : gpct > 0 ? 'warn' : ''}">${d}/${arr.length} 完了（${gpct}%）</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="stack">
+        <div class="item">
+          <div class="row" style="justify-content:space-between;">
+            <strong>全体工程</strong>
+            <span class="pill ${pct === 100 ? 'ok' : pct > 0 ? 'warn' : ''}">${done}/${total} 完了（${pct}%）</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="row" style="justify-content:space-between;">
+            <strong>基本工程</strong>
+            <span class="pill">${baseDone}/${baseSteps.length} 完了</span>
+          </div>
+        </div>
+        ${groupRows || '<div class="muted small">各話パックはまだ生成されていません。</div>'}
+      </div>
+    `;
+  }
+
+  function promptByNumber(p, num, fallbackText=''){
+    const exact = p.prompts.find(pr => String(pr.number || '').trim() === String(num).trim());
+    if (exact) return exact.id;
+    const titleHit = p.prompts.find(pr => (pr.title || '').includes(String(num)) && (!fallbackText || (pr.title || '').includes(fallbackText)));
+    if (titleHit) return titleHit.id;
+    const fallback = p.prompts.find(pr => (pr.title || '').includes(fallbackText));
+    return fallback ? fallback.id : (p.prompts[0]?.id || '');
+  }
+
+  function stepTemplateForEpisode(p, ep, total){
+    const isSingle = total === 1;
+    const isFirst = ep === 1;
+    const isFinal = ep === total && total > 1;
+    const kind = isSingle ? 'single' : isFirst ? 'first' : isFinal ? 'final' : 'middle';
+    const kindLabel = isSingle ? '単話/第1話兼最終話' : isFirst ? '第1話' : isFinal ? '最終話' : '道中話';
+    const titlePrefix = `第${ep}話`;
+    const hookNum = isSingle || isFirst ? '4-1' : isFinal ? '4-2' : '4-3';
+    const hookTitle = isSingle
+      ? `${titlePrefix} フック作成（単話/第1話兼最終話）`
+      : isFirst
+        ? `${titlePrefix} フック作成`
+        : isFinal
+          ? `${titlePrefix} 最終話フック作成`
+          : `${titlePrefix} 道中話フック作成`;
+
+    return [
+      {num: hookNum, title: hookTitle, memo: `${kindLabel}用のフック作成。`},
+      {num: '7', title: `${titlePrefix} 詳細プロット作成`, memo: `${kindLabel}用の詳細プロット作成。`},
+      {num: '6', title: `${titlePrefix} 詳細プロット整合性確認・リファイン`, memo: `7番の出力を6番で確認。`},
+      {num: '8', title: `${titlePrefix} OP〜起 作成`, memo: `8番で指定パート「OP〜起」を作成。`},
+      {num: '6', title: `${titlePrefix} OP〜起 整合性確認・リファイン`, memo: `8-A相当の確認。`},
+      {num: '8', title: `${titlePrefix} 承Ⅰ〜承Ⅱ 作成`, memo: `8番で指定パート「承Ⅰ〜承Ⅱ」を作成。`},
+      {num: '6', title: `${titlePrefix} 承Ⅰ〜承Ⅱ 整合性確認・リファイン`, memo: `8-B相当の確認。`},
+      {num: '8', title: `${titlePrefix} 転〜ED 作成`, memo: `8番で指定パート「転〜ED」を作成。`},
+      {num: '6', title: `${titlePrefix} 転〜ED 整合性確認・リファイン`, memo: `8-C相当の確認。`},
+      {num: '8-D', title: `${titlePrefix} 本文重厚化・リライト`, memo: `表現強化のみ。リライト後の整合性確認は行わない。`},
+      {num: '9', title: `${titlePrefix} 背景・NPCイラストプロンプト作成`, memo: `完成本文をもとに画像生成用プロンプトを作成。`},
+      {num: '10', title: `${titlePrefix} 依頼書作成`, memo: `その回の募集文・作中依頼書を作成。`}
+    ].map(t => ({...t, episodeNumber: ep, episodeKind: kind, episodeKindLabel: kindLabel}));
+  }
+
+  function generateEpisodePacks(){
+    const p = getProject();
+    const total = Number(document.getElementById('episodeTotalInput')?.value || 0);
+    const mode = document.getElementById('episodePackMode')?.value || 'replace';
+
+    if (!total || total < 1) {
+      toast('総話数を1以上で入力してください');
+      return;
+    }
+    if (total > 50 && !confirm(`${total}話分を生成します。工程数がかなり多くなりますが続行しますか？`)) return;
+
+    if (mode === 'replace') {
+      const generated = p.steps.filter(s => s.episodePack).length;
+      if (generated && !confirm('既存の生成済み各話パックを削除して再生成します。よろしいですか？')) return;
+      p.steps = p.steps.filter(s => !s.episodePack);
+    }
+
+    let order = p.steps.reduce((m, s) => Math.max(m, Number(s.order || 0)), 0);
+    const newSteps = [];
+    for (let ep = 1; ep <= total; ep++) {
+      stepTemplateForEpisode(p, ep, total).forEach(t => {
+        newSteps.push({
+          id: uid('step'),
+          title: t.title,
+          status: '未着手',
+          promptId: promptByNumber(p, t.num),
+          docIds: [],
+          memo: t.memo,
+          order: ++order,
+          updatedAt: nowText(),
+          episodePack: true,
+          episodeNumber: t.episodeNumber,
+          episodeKind: t.episodeKind,
+          episodeKindLabel: t.episodeKindLabel,
+          sourcePromptNumber: t.num
+        });
+      });
+    }
+    p.steps.push(...newSteps);
+    p.episodeTotal = total;
+    normalizeStepOrder(p);
+    saveState();
+    renderContent();
+    toast(`${total}話分の各話パックを生成しました`);
+  }
+
+  function clearEpisodePacks(){
+    const p = getProject();
+    const count = p.steps.filter(s => s.episodePack).length;
+    if (!count) { toast('生成済み各話パックはありません'); return; }
+    if (!confirm(`生成済み各話パック ${count}件を削除しますか？`)) return;
+    p.steps = p.steps.filter(s => !s.episodePack);
+    normalizeStepOrder(p);
+    saveState();
+    renderContent();
+    toast('生成済み各話パックを削除しました');
   }
 
   function generateHTML(p){
@@ -1783,10 +1984,13 @@ function loadState(){
       document.getElementById('copyGeneratedBtn').addEventListener('click', copyGenerated);
       const copyTop = document.getElementById('copyGeneratedTopBtn');
       if (copyTop) copyTop.addEventListener('click', copyGenerated);
-      const buildCopy = document.getElementById('buildAndCopyPromptBtn');
-      if (buildCopy) buildCopy.addEventListener('click', async () => { buildPrompt(); await copyGenerated(); });
       document.getElementById('saveGeneratedBtn').addEventListener('click', saveGeneratedAsOutput);
     }
+
+    const generateEpisodeBtn = document.getElementById('generateEpisodePacksBtn');
+    if (generateEpisodeBtn) generateEpisodeBtn.addEventListener('click', generateEpisodePacks);
+    const clearEpisodeBtn = document.getElementById('clearEpisodePacksBtn');
+    if (clearEpisodeBtn) clearEpisodeBtn.addEventListener('click', clearEpisodePacks);
 
     const exportBtn = document.getElementById('exportBtn');
     if (exportBtn) exportBtn.addEventListener('click', exportJSON);
@@ -1807,6 +2011,8 @@ function loadState(){
     if (action === 'moveStep') moveStep(id, Number(ds.dir || 0));
     if (action === 'useStep') { activeTab = 'generate'; render(); setTimeout(()=>{ const e=document.getElementById('genStepSelect'); if(e){e.value=id; setupGenerator();}}, 0); }
     if (action === 'editOutput') openOutputModal(id);
+    if (action === 'toggleStepDone') toggleStepDone(id);
+    if (action === 'setStepStatus') setStepStatus(id, ds.status || '未着手');
     if (action === 'deleteOutput') deleteOutput(id);
     if (action === 'promoteOutput') promoteOutput(id);
   }
@@ -1926,6 +2132,28 @@ function loadState(){
     p.prompts = p.prompts.filter(pr => pr.id !== id);
     p.steps.forEach(s => { if (s.promptId === id) s.promptId = ''; });
     saveState(); renderContent(); toast('プロンプトを削除しました');
+  }
+
+  function setStepStatus(id, status){
+    const p = getProject();
+    const s = p.steps.find(x => x.id === id);
+    if (!s) return;
+    s.status = status;
+    s.updatedAt = nowText();
+    saveState();
+    renderContent();
+    toast(`工程を「${status}」にしました`);
+  }
+
+  function toggleStepDone(id){
+    const p = getProject();
+    const s = p.steps.find(x => x.id === id);
+    if (!s) return;
+    s.status = s.status === '完了' ? '未着手' : '完了';
+    s.updatedAt = nowText();
+    saveState();
+    renderContent();
+    toast(s.status === '完了' ? '完了にしました' : '未完了に戻しました');
   }
 
   function openStepModal(id){
