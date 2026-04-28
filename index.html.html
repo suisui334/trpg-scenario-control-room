@@ -1,0 +1,1457 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TRPGシナリオ管制室 v0.1</title>
+  <style>
+    :root {
+      --bg: #111318;
+      --panel: #181b22;
+      --panel2: #20242d;
+      --text: #f0f2f5;
+      --muted: #aeb6c2;
+      --line: #343946;
+      --accent: #9f7aea;
+      --accent2: #6ee7b7;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --ok: #34d399;
+      --input: #0f1117;
+      --shadow: rgba(0,0,0,.35);
+      --radius: 14px;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #202438 0, #111318 45%, #0b0d11 100%);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+    }
+    button, input, textarea, select {
+      font: inherit;
+    }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel2);
+      color: var(--text);
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: .12s ease;
+    }
+    button:hover { border-color: var(--accent); transform: translateY(-1px); }
+    button.primary {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border-color: #7c3aed;
+    }
+    button.good { border-color: rgba(52,211,153,.55); }
+    button.warn { border-color: rgba(251,191,36,.55); }
+    button.danger { border-color: rgba(248,113,113,.55); color: #fecaca; }
+    button.ghost { background: transparent; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--input);
+      color: var(--text);
+      padding: 10px 11px;
+      outline: none;
+    }
+    textarea { min-height: 130px; resize: vertical; }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(159,122,234,.15);
+    }
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 0 0 5px;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(17,19,24,.9);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #38bdf8);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      box-shadow: 0 10px 25px var(--shadow);
+    }
+    .brand h1 {
+      font-size: 17px;
+      margin: 0;
+      line-height: 1.2;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .sidebar-section {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    .project-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .project-item {
+      text-align: left;
+      width: 100%;
+      padding: 10px;
+      background: rgba(32,36,45,.75);
+    }
+    .project-item.active {
+      border-color: var(--accent);
+      background: rgba(159,122,234,.16);
+    }
+    .project-item .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .main {
+      padding: 22px;
+      overflow: hidden;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .topbar h2 { margin: 0; font-size: 24px; }
+    .topbar .meta { color: var(--muted); font-size: 13px; }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab {
+      background: rgba(32,36,45,.7);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+    }
+    .tab.active {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(159,122,234,.18);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+    .card {
+      background: rgba(24,27,34,.92);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 15px;
+      box-shadow: 0 12px 28px var(--shadow);
+    }
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+    .span-3 { grid-column: span 3; }
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stack { display: grid; gap: 10px; }
+    .item {
+      border: 1px solid var(--line);
+      background: rgba(32,36,45,.58);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .item-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--line);
+      background: rgba(15,17,23,.65);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      margin: 2px 4px 2px 0;
+    }
+    .pill.ok { color: #bbf7d0; border-color: rgba(52,211,153,.4); }
+    .pill.warn { color: #fde68a; border-color: rgba(251,191,36,.4); }
+    .pill.danger { color: #fecaca; border-color: rgba(248,113,113,.4); }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .hidden { display: none !important; }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+    .notice {
+      border: 1px solid rgba(159,122,234,.45);
+      background: rgba(159,122,234,.12);
+      color: #ddd6fe;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .danger-zone {
+      border-color: rgba(248,113,113,.35);
+      background: rgba(127,29,29,.12);
+    }
+    .checkbox-list {
+      max-height: 220px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(15,17,23,.55);
+    }
+    .checkbox-row {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 6px;
+      border-bottom: 1px solid rgba(52,57,70,.55);
+    }
+    .checkbox-row:last-child { border-bottom: 0; }
+    .checkbox-row input { width: auto; margin-top: 5px; }
+    .generated {
+      min-height: 360px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #111827;
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 10px 13px;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: .15s ease;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      z-index: 10;
+    }
+    .modal {
+      width: min(900px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: #151821;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 25px 70px rgba(0,0,0,.55);
+    }
+    .modal h3 { margin-top: 0; }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .main { padding: 14px; }
+      .topbar { display: grid; }
+      .span-8, .span-6, .span-4, .span-3 { grid-column: span 12; }
+      .form-grid { grid-template-columns: 1fr; }
+      .project-list {
+        grid-template-columns: 1fr;
+      }
+      .sidebar details summary { cursor: pointer; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">卓</div>
+        <div>
+          <h1>TRPGシナリオ管制室</h1>
+          <p>v0.1 / APIキー不要・ローカル保存</p>
+        </div>
+      </div>
+
+      <div class="notice small">
+        同じブラウザでは自動保存されます。大事な資料は必ずJSONエクスポートしてください。
+      </div>
+
+      <div class="sidebar-section">
+        <div class="row" style="justify-content:space-between;">
+          <strong>プロジェクト</strong>
+          <button class="primary" id="addProjectBtn">追加</button>
+        </div>
+        <div id="projectList" class="project-list"></div>
+      </div>
+
+      <div class="sidebar-section stack">
+        <button id="quickExportBtn">JSONバックアップ</button>
+        <label class="small">JSONインポート</label>
+        <input id="quickImportInput" type="file" accept="application/json,.json" />
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2 id="projectTitle">読み込み中...</h2>
+          <div class="meta" id="projectMeta"></div>
+        </div>
+        <div class="row">
+          <button id="renameProjectBtn">プロジェクト編集</button>
+          <button id="duplicateProjectBtn">複製</button>
+          <button class="danger" id="deleteProjectBtn">削除</button>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs"></div>
+      <section id="content"></section>
+    </main>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'trpg_scenario_control_room_v01';
+  const APP_VERSION = '0.1.0';
+  let state = loadState();
+  let activeTab = 'dashboard';
+  let currentGeneratedText = '';
+
+  const tabs = [
+    ['dashboard', '概要'],
+    ['documents', '資料'],
+    ['prompts', 'プロンプト'],
+    ['steps', '工程'],
+    ['generate', '生成'],
+    ['outputs', '出力履歴'],
+    ['backup', 'バックアップ']
+  ];
+
+  function uid(prefix='id'){
+    return prefix + '_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+  }
+
+  function nowText(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function sampleState(){
+    const p1 = uid('project');
+    const doc1 = uid('doc');
+    const doc2 = uid('doc');
+    const pr1 = uid('prompt');
+    const pr2 = uid('prompt');
+    const pr3 = uid('prompt');
+    const st1 = uid('step');
+    const st2 = uid('step');
+    const st3 = uid('step');
+    return {
+      version: APP_VERSION,
+      currentProjectId: p1,
+      lastSavedAt: nowText(),
+      projects: [{
+        id: p1,
+        title: 'サンプル：全7話キャンペーン制作',
+        system: 'ソード・ワールド2.5',
+        genre: '和風ダークファンタジー',
+        status: '作業中',
+        note: 'ここにキャンペーンや単発シナリオの制作資料をまとめます。不要ならプロジェクトごと削除してください。',
+        createdAt: nowText(),
+        updatedAt: nowText(),
+        documents: [
+          {
+            id: doc1,
+            title: '制作方針メモ',
+            category: '基本資料',
+            status: '採用稿',
+            scope: 'GM用',
+            tags: '方針, 禁止事項',
+            content: '・公式設定を不用意に改変しない。\n・NPCを増やしすぎない。\n・PC視点で初出語が分かるようにする。\n・時間配分を守る。',
+            updatedAt: nowText()
+          },
+          {
+            id: doc2,
+            title: '第1話メモ',
+            category: '各話資料',
+            status: '作業稿',
+            scope: 'GM用',
+            tags: '第1話, プロット',
+            content: '第1話のフックや暫定案をここに保存します。',
+            updatedAt: nowText()
+          }
+        ],
+        prompts: [
+          {
+            id: pr1,
+            title: '各話詳細プロット作成',
+            category: 'シナリオ作成',
+            description: '各話の詳細プロットを作成するための基本プロンプト。',
+            template:
+`# 命令書：キャンペーン形式各話の詳細シナリオプロット作成
+
+あなたはプロのTRPGシナリオライター兼ゲームデザイナーです。
+以下の入力要素と参照資料をもとに、指定話数の詳細なTRPGプロットを作成してください。
+
+## 入力要素
+
+システム：
+{{システム}}
+
+ジャンル：
+{{ジャンル}}
+
+今回作成する話数：
+{{話数}}
+
+PCレベル：
+{{PCレベル}}
+
+想定時間：
+{{想定時間}}
+
+今回の目的：
+{{今回の目的}}
+
+## 必須条件
+・PC視点で理解できない初出語を放置しない。
+・NPCを増やしすぎない。
+・OPとEDを省略しない。
+・時間配分を明記する。
+・必要な判定候補を入れる。
+・冗長な往復導線を避ける。
+
+## 参照資料
+{{参照資料}}
+
+## 出力形式
+{{出力形式}}`,
+            fields: 'システム,ジャンル,話数,PCレベル,想定時間,今回の目的,出力形式',
+            updatedAt: nowText()
+          },
+          {
+            id: pr2,
+            title: 'クリティカルレビュー',
+            category: 'レビュー',
+            description: 'プロット、本文、NPC、世界観などに対する辛口評価用。複数工程で使い回す想定。',
+            template:
+`# 命令書：TRPGシナリオ・クリティカルレビュー
+
+あなたはプロのTRPGシナリオライター兼編集者です。
+以下の対象本文を、辛口で評価してください。
+
+## レビュー対象
+{{レビュー対象}}
+
+## 重視する観点
+{{重視観点}}
+
+## 前提・禁止事項
+{{前提・禁止事項}}
+
+## 対象本文
+{{対象本文}}
+
+## 出力条件
+・良い点だけで済ませない。
+・問題点、理由、修正案、優先度を分ける。
+・PC視点で「何のこと？」となる箇所を洗い出す。
+・冗長な導線、NPC過多、情報過多を厳しく見る。
+・ただし、改善可能な形で提案する。`,
+            fields: 'レビュー対象,重視観点,前提・禁止事項,対象本文',
+            updatedAt: nowText()
+          },
+          {
+            id: pr3,
+            title: '改稿反映',
+            category: '改稿',
+            description: 'レビュー結果をもとに決定稿へ整えるプロンプト。',
+            template:
+`# 命令書：改稿反映
+
+あなたはプロのTRPGシナリオライターです。
+以下の原稿と修正方針をもとに、改稿版を作成してください。
+
+## 原稿
+{{原稿}}
+
+## 修正方針
+{{修正方針}}
+
+## 維持する要素
+{{維持する要素}}
+
+## 出力条件
+・内容を端折らない。
+・要約ではなく、改稿済み本文として出力する。
+・矛盾を増やさない。
+・読みやすい構造に整える。`,
+            fields: '原稿,修正方針,維持する要素',
+            updatedAt: nowText()
+          }
+        ],
+        steps: [
+          {
+            id: st1,
+            title: '各話詳細プロット作成',
+            status: '未着手',
+            promptId: pr1,
+            docIds: [doc1, doc2],
+            memo: '話数、PCレベル、想定時間を埋めて生成する。',
+            order: 1,
+            updatedAt: nowText()
+          },
+          {
+            id: st2,
+            title: '各話詳細プロットの辛口評価',
+            status: '未着手',
+            promptId: pr2,
+            docIds: [doc1],
+            memo: '同じクリティカルレビュープロンプトを使う。レビュー対象だけ差し替える。',
+            order: 2,
+            updatedAt: nowText()
+          },
+          {
+            id: st3,
+            title: '改稿反映',
+            status: '未着手',
+            promptId: pr3,
+            docIds: [doc1],
+            memo: 'レビュー結果を受けて採用稿へ整える。',
+            order: 3,
+            updatedAt: nowText()
+          }
+        ],
+        outputs: [],
+        notes: [],
+        updatedAt: nowText()
+      }]
+    };
+  }
+
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return sampleState();
+      const parsed = JSON.parse(raw);
+      if (!parsed.projects || !Array.isArray(parsed.projects)) return sampleState();
+      return parsed;
+    } catch(e) {
+      console.error(e);
+      return sampleState();
+    }
+  }
+
+  function saveState(){
+    state.lastSavedAt = nowText();
+    const p = getProject();
+    if (p) p.updatedAt = nowText();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    renderSidebar();
+  }
+
+  function getProject(){
+    if (!state.projects.length) {
+      const s = sampleState();
+      state.projects = s.projects;
+      state.currentProjectId = s.currentProjectId;
+    }
+    return state.projects.find(p => p.id === state.currentProjectId) || state.projects[0];
+  }
+
+  function esc(str=''){
+    return String(str)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  function toast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1900);
+  }
+
+  function render(){
+    renderSidebar();
+    renderTop();
+    renderTabs();
+    renderContent();
+  }
+
+  function renderSidebar(){
+    const list = document.getElementById('projectList');
+    list.innerHTML = state.projects.map(p => `
+      <button class="project-item ${p.id === state.currentProjectId ? 'active' : ''}" data-project="${p.id}">
+        <div><strong>${esc(p.title)}</strong></div>
+        <div class="small">${esc(p.system || 'システム未設定')} / ${esc(p.status || '状態未設定')}</div>
+      </button>
+    `).join('');
+    list.querySelectorAll('[data-project]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.currentProjectId = btn.dataset.project;
+        saveState();
+        render();
+      });
+    });
+  }
+
+  function renderTop(){
+    const p = getProject();
+    document.getElementById('projectTitle').textContent = p.title;
+    document.getElementById('projectMeta').textContent =
+      `${p.system || 'システム未設定'} / ${p.genre || 'ジャンル未設定'} / ${p.status || '状態未設定'} / 最終保存：${state.lastSavedAt || '未保存'}`;
+  }
+
+  function renderTabs(){
+    const el = document.getElementById('tabs');
+    el.innerHTML = tabs.map(([id, name]) => `
+      <button class="tab ${activeTab === id ? 'active' : ''}" data-tab="${id}">${name}</button>
+    `).join('');
+    el.querySelectorAll('[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        renderContent();
+        renderTabs();
+      });
+    });
+  }
+
+  function renderContent(){
+    const p = getProject();
+    const c = document.getElementById('content');
+    if (activeTab === 'dashboard') c.innerHTML = dashboardHTML(p);
+    if (activeTab === 'documents') c.innerHTML = documentsHTML(p);
+    if (activeTab === 'prompts') c.innerHTML = promptsHTML(p);
+    if (activeTab === 'steps') c.innerHTML = stepsHTML(p);
+    if (activeTab === 'generate') c.innerHTML = generateHTML(p);
+    if (activeTab === 'outputs') c.innerHTML = outputsHTML(p);
+    if (activeTab === 'backup') c.innerHTML = backupHTML(p);
+    bindContentEvents();
+  }
+
+  function dashboardHTML(p){
+    const done = p.steps.filter(s => s.status === '完了').length;
+    const total = p.steps.length;
+    const current = p.steps.find(s => s.status === '作業中') || p.steps.find(s => s.status !== '完了');
+    return `
+      <div class="grid">
+        <div class="card span-8">
+          <h3>プロジェクト概要</h3>
+          <div class="stack">
+            <div><span class="muted">システム：</span>${esc(p.system || '-')}</div>
+            <div><span class="muted">ジャンル：</span>${esc(p.genre || '-')}</div>
+            <div><span class="muted">状態：</span>${esc(p.status || '-')}</div>
+            <div><span class="muted">メモ：</span><div class="mono">${esc(p.note || '未記入')}</div></div>
+          </div>
+        </div>
+        <div class="card span-4">
+          <h3>状況</h3>
+          <div class="stack">
+            <div>資料：<strong>${p.documents.length}</strong></div>
+            <div>プロンプト：<strong>${p.prompts.length}</strong></div>
+            <div>工程：<strong>${done}/${total}</strong> 完了</div>
+            <div>出力履歴：<strong>${p.outputs.length}</strong></div>
+            <div class="muted small">現在候補：${current ? esc(current.title) : 'なし'}</div>
+          </div>
+        </div>
+        <div class="card span-12">
+          <h3>最近の工程</h3>
+          <div class="stack">
+            ${p.steps.slice().sort((a,b)=>(a.order||0)-(b.order||0)).slice(0,8).map(s => stepItemHTML(p, s, false)).join('') || '<div class="muted">工程がありません。</div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function documentsHTML(p){
+    return `
+      <div class="grid">
+        <div class="card span-12">
+          <div class="row" style="justify-content:space-between;">
+            <h3>資料管理</h3>
+            <button class="primary" data-action="editDoc" data-id="">資料を追加</button>
+          </div>
+          <p class="muted small">世界観、NPC、各話プロット、禁止事項などを保存します。ChatGPTへ渡す資料として生成画面で選択できます。</p>
+          <div class="stack">
+            ${p.documents.map(d => docItemHTML(d)).join('') || '<div class="muted">資料がありません。</div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function docItemHTML(d){
+    return `
+      <div class="item">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div class="item-title">${esc(d.title)}</div>
+            <span class="pill">${esc(d.category || '未分類')}</span>
+            <span class="pill ${d.status === '採用稿' ? 'ok' : d.status === '没案' ? 'danger' : 'warn'}">${esc(d.status || '作業稿')}</span>
+            <span class="pill">${esc(d.scope || 'GM用')}</span>
+            ${(d.tags || '').split(',').filter(Boolean).map(t => `<span class="pill">#${esc(t.trim())}</span>`).join('')}
+          </div>
+          <div class="row">
+            <button data-action="editDoc" data-id="${d.id}">編集</button>
+            <button class="danger" data-action="deleteDoc" data-id="${d.id}">削除</button>
+          </div>
+        </div>
+        <div class="muted small">更新：${esc(d.updatedAt || '-')}</div>
+        <div class="mono small" style="margin-top:8px;">${esc((d.content || '').slice(0, 500))}${(d.content || '').length > 500 ? '\n...' : ''}</div>
+      </div>
+    `;
+  }
+
+  function promptsHTML(p){
+    return `
+      <div class="grid">
+        <div class="card span-12">
+          <div class="row" style="justify-content:space-between;">
+            <h3>プロンプト管理</h3>
+            <button class="primary" data-action="editPrompt" data-id="">プロンプトを追加</button>
+          </div>
+          <p class="muted small">プロンプト内では <span class="mono">{{話数}}</span> のような変数が使えます。工程とは分離しているため、同じプロンプトを複数工程で使い回せます。</p>
+          <div class="stack">
+            ${p.prompts.map(pr => promptItemHTML(pr)).join('') || '<div class="muted">プロンプトがありません。</div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function promptItemHTML(pr){
+    return `
+      <div class="item">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div class="item-title">${esc(pr.title)}</div>
+            <span class="pill">${esc(pr.category || '未分類')}</span>
+            <span class="pill">変数：${extractVars(pr).length}</span>
+          </div>
+          <div class="row">
+            <button data-action="editPrompt" data-id="${pr.id}">編集</button>
+            <button data-action="duplicatePrompt" data-id="${pr.id}">複製</button>
+            <button class="danger" data-action="deletePrompt" data-id="${pr.id}">削除</button>
+          </div>
+        </div>
+        <div class="muted small">${esc(pr.description || '')}</div>
+        <div class="mono small" style="margin-top:8px;">${esc((pr.template || '').slice(0, 650))}${(pr.template || '').length > 650 ? '\n...' : ''}</div>
+      </div>
+    `;
+  }
+
+  function stepsHTML(p){
+    const sorted = p.steps.slice().sort((a,b)=>(a.order||0)-(b.order||0));
+    return `
+      <div class="grid">
+        <div class="card span-12">
+          <div class="row" style="justify-content:space-between;">
+            <h3>工程管理</h3>
+            <button class="primary" data-action="editStep" data-id="">工程を追加</button>
+          </div>
+          <p class="muted small">工程は「いつ使うか」、プロンプトは「何を命令するか」です。ここを分けることで、クリティカルレビューを何度でも流用できます。</p>
+          <div class="stack">
+            ${sorted.map(s => stepItemHTML(p, s, true)).join('') || '<div class="muted">工程がありません。</div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function stepItemHTML(p, s, controls=true){
+    const pr = p.prompts.find(x => x.id === s.promptId);
+    const statusClass = s.status === '完了' ? 'ok' : s.status === '保留' ? 'danger' : s.status === '作業中' ? 'warn' : '';
+    const docNames = (s.docIds || []).map(id => p.documents.find(d => d.id === id)?.title).filter(Boolean);
+    return `
+      <div class="item">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div class="item-title">${esc(s.order || 0)}. ${esc(s.title)}</div>
+            <span class="pill ${statusClass}">${esc(s.status || '未着手')}</span>
+            <span class="pill">使用プロンプト：${esc(pr ? pr.title : '未設定')}</span>
+          </div>
+          ${controls ? `<div class="row">
+            <button data-action="moveStep" data-dir="-1" data-id="${s.id}">↑</button>
+            <button data-action="moveStep" data-dir="1" data-id="${s.id}">↓</button>
+            <button data-action="editStep" data-id="${s.id}">編集</button>
+            <button data-action="useStep" data-id="${s.id}">生成へ</button>
+            <button class="danger" data-action="deleteStep" data-id="${s.id}">削除</button>
+          </div>` : ''}
+        </div>
+        <div class="muted small">資料：${docNames.length ? esc(docNames.join('、')) : 'なし'}</div>
+        <div class="muted small">メモ：${esc(s.memo || '-')}</div>
+      </div>
+    `;
+  }
+
+  function generateHTML(p){
+    const firstStep = p.steps.slice().sort((a,b)=>(a.order||0)-(b.order||0))[0];
+    return `
+      <div class="grid">
+        <div class="card span-4">
+          <h3>生成設定</h3>
+          <div class="stack">
+            <div>
+              <label>工程</label>
+              <select id="genStepSelect">
+                <option value="">工程を使わない</option>
+                ${p.steps.slice().sort((a,b)=>(a.order||0)-(b.order||0)).map(s => `<option value="${s.id}">${esc((s.order||0)+'. '+s.title)}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label>プロンプト</label>
+              <select id="genPromptSelect">
+                ${p.prompts.map(pr => `<option value="${pr.id}">${esc(pr.title)}</option>`).join('')}
+              </select>
+            </div>
+            <div id="genFields" class="stack"></div>
+            <div>
+              <label>含める資料</label>
+              <div id="genDocChecks" class="checkbox-list"></div>
+            </div>
+            <div class="toolbar">
+              <button class="primary" id="buildPromptBtn">プロンプト生成</button>
+              <button id="copyGeneratedBtn">コピー</button>
+              <button class="good" id="saveGeneratedBtn">出力履歴に保存</button>
+            </div>
+          </div>
+        </div>
+        <div class="card span-8">
+          <h3>ChatGPT貼り付け用テキスト</h3>
+          <textarea id="generatedText" class="generated mono" placeholder="ここに生成結果が表示されます。"></textarea>
+        </div>
+      </div>
+    `;
+  }
+
+  function outputsHTML(p){
+    return `
+      <div class="grid">
+        <div class="card span-12">
+          <div class="row" style="justify-content:space-between;">
+            <h3>出力履歴</h3>
+            <button class="primary" data-action="editOutput" data-id="">出力を手動追加</button>
+          </div>
+          <p class="muted small">ChatGPTから返ってきた案や決定稿を貼り戻して保存します。採用稿・旧稿・没案を分けるのが肝です。</p>
+          <div class="stack">
+            ${p.outputs.slice().reverse().map(o => outputItemHTML(o)).join('') || '<div class="muted">出力履歴がありません。</div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function outputItemHTML(o){
+    return `
+      <div class="item">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div class="item-title">${esc(o.title)}</div>
+            <span class="pill ${o.status === '採用稿' ? 'ok' : o.status === '没案' ? 'danger' : 'warn'}">${esc(o.status || '保留')}</span>
+            <span class="pill">${esc(o.category || '出力')}</span>
+          </div>
+          <div class="row">
+            <button data-action="editOutput" data-id="${o.id}">編集</button>
+            <button data-action="promoteOutput" data-id="${o.id}">資料化</button>
+            <button class="danger" data-action="deleteOutput" data-id="${o.id}">削除</button>
+          </div>
+        </div>
+        <div class="muted small">保存：${esc(o.createdAt || '-')}</div>
+        <div class="mono small" style="margin-top:8px;">${esc((o.content || '').slice(0, 700))}${(o.content || '').length > 700 ? '\n...' : ''}</div>
+      </div>
+    `;
+  }
+
+  function backupHTML(p){
+    return `
+      <div class="grid">
+        <div class="card span-6">
+          <h3>バックアップ</h3>
+          <p class="muted small">ブラウザ内保存だけに頼るのは危険です。作業後はJSONを書き出してください。</p>
+          <div class="stack">
+            <div>最終保存：<strong>${esc(state.lastSavedAt || '-')}</strong></div>
+            <div>プロジェクト数：<strong>${state.projects.length}</strong></div>
+            <button class="primary" id="exportBtn">JSONエクスポート</button>
+            <label>JSONインポート</label>
+            <input id="importInput" type="file" accept="application/json,.json" />
+          </div>
+        </div>
+        <div class="card span-6 danger-zone">
+          <h3>危険領域</h3>
+          <p class="muted small">現在のブラウザ内データを初期化します。バックアップなしで押すと、普通に泣きます。</p>
+          <button class="danger" id="resetBtn">全データ初期化</button>
+        </div>
+        <div class="card span-12">
+          <h3>運用メモ</h3>
+          <div class="mono small">PCとスマホ間の共有は、JSONエクスポート → Google Drive / iCloud / Dropbox等へ保存 → 別端末でインポート、という手動同期を想定しています。</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function bindContentEvents(){
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id, btn.dataset));
+    });
+
+    const stepSelect = document.getElementById('genStepSelect');
+    const promptSelect = document.getElementById('genPromptSelect');
+    if (stepSelect && promptSelect) {
+      const p = getProject();
+      if (p.steps[0]) {
+        stepSelect.value = p.steps.slice().sort((a,b)=>(a.order||0)-(b.order||0))[0].id;
+        const st = p.steps.find(s => s.id === stepSelect.value);
+        if (st && st.promptId) promptSelect.value = st.promptId;
+      }
+      setupGenerator();
+      stepSelect.addEventListener('change', setupGenerator);
+      promptSelect.addEventListener('change', setupGenerator);
+      document.getElementById('buildPromptBtn').addEventListener('click', buildPrompt);
+      document.getElementById('copyGeneratedBtn').addEventListener('click', copyGenerated);
+      document.getElementById('saveGeneratedBtn').addEventListener('click', saveGeneratedAsOutput);
+    }
+
+    const exportBtn = document.getElementById('exportBtn');
+    if (exportBtn) exportBtn.addEventListener('click', exportJSON);
+    const importInput = document.getElementById('importInput');
+    if (importInput) importInput.addEventListener('change', importJSON);
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) resetBtn.addEventListener('click', resetAll);
+  }
+
+  function handleAction(action, id, ds){
+    if (action === 'editDoc') openDocModal(id);
+    if (action === 'deleteDoc') deleteDoc(id);
+    if (action === 'editPrompt') openPromptModal(id);
+    if (action === 'duplicatePrompt') duplicatePrompt(id);
+    if (action === 'deletePrompt') deletePrompt(id);
+    if (action === 'editStep') openStepModal(id);
+    if (action === 'deleteStep') deleteStep(id);
+    if (action === 'moveStep') moveStep(id, Number(ds.dir || 0));
+    if (action === 'useStep') { activeTab = 'generate'; render(); setTimeout(()=>{ const e=document.getElementById('genStepSelect'); if(e){e.value=id; setupGenerator();}}, 0); }
+    if (action === 'editOutput') openOutputModal(id);
+    if (action === 'deleteOutput') deleteOutput(id);
+    if (action === 'promoteOutput') promoteOutput(id);
+  }
+
+  function openModal(title, bodyHTML, onSave){
+    const root = document.getElementById('modalRoot');
+    root.innerHTML = `
+      <div class="modal-backdrop">
+        <div class="modal">
+          <div class="row" style="justify-content:space-between;">
+            <h3>${esc(title)}</h3>
+            <button id="modalCloseBtn">閉じる</button>
+          </div>
+          ${bodyHTML}
+          <div class="toolbar">
+            <button class="primary" id="modalSaveBtn">保存</button>
+            <button id="modalCancelBtn">キャンセル</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('modalCloseBtn').onclick = closeModal;
+    document.getElementById('modalCancelBtn').onclick = closeModal;
+    document.getElementById('modalSaveBtn').onclick = () => {
+      if (onSave()) closeModal();
+    };
+  }
+
+  function closeModal(){
+    document.getElementById('modalRoot').innerHTML = '';
+  }
+
+  function val(id){ return document.getElementById(id)?.value || ''; }
+
+  function openDocModal(id){
+    const p = getProject();
+    const d = p.documents.find(x => x.id === id) || {
+      id: '', title: '', category: '', status: '作業稿', scope: 'GM用', tags: '', content: ''
+    };
+    openModal(id ? '資料を編集' : '資料を追加', `
+      <div class="form-grid">
+        <div><label>タイトル</label><input id="docTitle" value="${esc(d.title)}"></div>
+        <div><label>カテゴリ</label><input id="docCategory" value="${esc(d.category)}" placeholder="世界観 / NPC / 各話資料など"></div>
+        <div><label>状態</label><select id="docStatus">${options(['作業稿','採用稿','旧稿','没案','保留'], d.status)}</select></div>
+        <div><label>公開範囲</label><select id="docScope">${options(['GM用','PL公開可','秘匿','外部向け'], d.scope)}</select></div>
+      </div>
+      <div style="margin-top:10px;"><label>タグ（カンマ区切り）</label><input id="docTags" value="${esc(d.tags)}"></div>
+      <div style="margin-top:10px;"><label>本文</label><textarea id="docContent" style="min-height:320px;">${esc(d.content)}</textarea></div>
+    `, () => {
+      if (!val('docTitle').trim()) { toast('タイトルが必要です'); return false; }
+      const obj = {
+        id: id || uid('doc'),
+        title: val('docTitle').trim(),
+        category: val('docCategory').trim(),
+        status: val('docStatus'),
+        scope: val('docScope'),
+        tags: val('docTags'),
+        content: val('docContent'),
+        updatedAt: nowText()
+      };
+      if (id) p.documents = p.documents.map(x => x.id === id ? obj : x);
+      else p.documents.push(obj);
+      saveState(); renderContent(); toast('資料を保存しました'); return true;
+    });
+  }
+
+  function deleteDoc(id){
+    if (!confirm('この資料を削除しますか？工程からの参照も外れます。')) return;
+    const p = getProject();
+    p.documents = p.documents.filter(d => d.id !== id);
+    p.steps.forEach(s => s.docIds = (s.docIds || []).filter(x => x !== id));
+    saveState(); renderContent(); toast('資料を削除しました');
+  }
+
+  function openPromptModal(id){
+    const p = getProject();
+    const pr = p.prompts.find(x => x.id === id) || {
+      id: '', title: '', category: '', description: '', template: '', fields: ''
+    };
+    openModal(id ? 'プロンプトを編集' : 'プロンプトを追加', `
+      <div class="form-grid">
+        <div><label>タイトル</label><input id="promptTitle" value="${esc(pr.title)}"></div>
+        <div><label>カテゴリ</label><input id="promptCategory" value="${esc(pr.category)}" placeholder="レビュー / 本文作成など"></div>
+      </div>
+      <div style="margin-top:10px;"><label>説明</label><input id="promptDescription" value="${esc(pr.description)}"></div>
+      <div style="margin-top:10px;"><label>入力欄（任意。カンマ区切り。未入力でも {{変数}} から自動抽出）</label><input id="promptFields" value="${esc(pr.fields)}" placeholder="話数,PCレベル,対象本文"></div>
+      <div style="margin-top:10px;"><label>テンプレート</label><textarea id="promptTemplate" style="min-height:360px;">${esc(pr.template)}</textarea></div>
+      <p class="muted small">例：{{話数}} のように書くと、生成画面で入力欄になります。</p>
+    `, () => {
+      if (!val('promptTitle').trim()) { toast('タイトルが必要です'); return false; }
+      const obj = {
+        id: id || uid('prompt'),
+        title: val('promptTitle').trim(),
+        category: val('promptCategory').trim(),
+        description: val('promptDescription'),
+        fields: val('promptFields'),
+        template: val('promptTemplate'),
+        updatedAt: nowText()
+      };
+      if (id) p.prompts = p.prompts.map(x => x.id === id ? obj : x);
+      else p.prompts.push(obj);
+      saveState(); renderContent(); toast('プロンプトを保存しました'); return true;
+    });
+  }
+
+  function duplicatePrompt(id){
+    const p = getProject();
+    const pr = p.prompts.find(x => x.id === id);
+    if (!pr) return;
+    p.prompts.push({...pr, id: uid('prompt'), title: pr.title + ' のコピー', updatedAt: nowText()});
+    saveState(); renderContent(); toast('プロンプトを複製しました');
+  }
+
+  function deletePrompt(id){
+    if (!confirm('このプロンプトを削除しますか？工程からの参照も外れます。')) return;
+    const p = getProject();
+    p.prompts = p.prompts.filter(pr => pr.id !== id);
+    p.steps.forEach(s => { if (s.promptId === id) s.promptId = ''; });
+    saveState(); renderContent(); toast('プロンプトを削除しました');
+  }
+
+  function openStepModal(id){
+    const p = getProject();
+    const s = p.steps.find(x => x.id === id) || {
+      id: '', title: '', status: '未着手', promptId: p.prompts[0]?.id || '', docIds: [], memo: '', order: p.steps.length + 1
+    };
+    openModal(id ? '工程を編集' : '工程を追加', `
+      <div class="form-grid">
+        <div><label>工程名</label><input id="stepTitle" value="${esc(s.title)}"></div>
+        <div><label>順番</label><input id="stepOrder" type="number" value="${esc(s.order || p.steps.length+1)}"></div>
+        <div><label>状態</label><select id="stepStatus">${options(['未着手','作業中','レビュー待ち','修正中','完了','保留'], s.status)}</select></div>
+        <div><label>使用プロンプト</label><select id="stepPrompt">${p.prompts.map(pr => `<option value="${pr.id}" ${pr.id === s.promptId ? 'selected' : ''}>${esc(pr.title)}</option>`).join('')}</select></div>
+      </div>
+      <div style="margin-top:10px;"><label>紐づける資料</label>
+        <div class="checkbox-list">
+          ${p.documents.map(d => `<label class="checkbox-row"><input type="checkbox" class="stepDocCheck" value="${d.id}" ${(s.docIds||[]).includes(d.id) ? 'checked' : ''}><span>${esc(d.title)} <span class="muted small">/ ${esc(d.status || '')}</span></span></label>`).join('') || '<div class="muted">資料がありません。</div>'}
+        </div>
+      </div>
+      <div style="margin-top:10px;"><label>メモ</label><textarea id="stepMemo">${esc(s.memo || '')}</textarea></div>
+    `, () => {
+      if (!val('stepTitle').trim()) { toast('工程名が必要です'); return false; }
+      const docIds = [...document.querySelectorAll('.stepDocCheck:checked')].map(x => x.value);
+      const obj = {
+        id: id || uid('step'),
+        title: val('stepTitle').trim(),
+        order: Number(val('stepOrder') || p.steps.length+1),
+        status: val('stepStatus'),
+        promptId: val('stepPrompt'),
+        docIds,
+        memo: val('stepMemo'),
+        updatedAt: nowText()
+      };
+      if (id) p.steps = p.steps.map(x => x.id === id ? obj : x);
+      else p.steps.push(obj);
+      normalizeStepOrder(p);
+      saveState(); renderContent(); toast('工程を保存しました'); return true;
+    });
+  }
+
+  function deleteStep(id){
+    if (!confirm('この工程を削除しますか？')) return;
+    const p = getProject();
+    p.steps = p.steps.filter(s => s.id !== id);
+    normalizeStepOrder(p);
+    saveState(); renderContent(); toast('工程を削除しました');
+  }
+
+  function moveStep(id, dir){
+    const p = getProject();
+    const arr = p.steps.slice().sort((a,b)=>(a.order||0)-(b.order||0));
+    const idx = arr.findIndex(s => s.id === id);
+    const nidx = idx + dir;
+    if (idx < 0 || nidx < 0 || nidx >= arr.length) return;
+    [arr[idx], arr[nidx]] = [arr[nidx], arr[idx]];
+    arr.forEach((s, i) => s.order = i+1);
+    p.steps = arr;
+    saveState(); renderContent();
+  }
+
+  function normalizeStepOrder(p){
+    p.steps.sort((a,b)=>(a.order||0)-(b.order||0)).forEach((s,i) => s.order = i+1);
+  }
+
+  function openOutputModal(id){
+    const p = getProject();
+    const o = p.outputs.find(x => x.id === id) || { id:'', title:'', category:'出力', status:'保留', content:'', createdAt: nowText() };
+    openModal(id ? '出力を編集' : '出力を追加', `
+      <div class="form-grid">
+        <div><label>タイトル</label><input id="outTitle" value="${esc(o.title)}"></div>
+        <div><label>カテゴリ</label><input id="outCategory" value="${esc(o.category)}"></div>
+        <div><label>状態</label><select id="outStatus">${options(['採用稿','作業稿','旧稿','没案','保留'], o.status)}</select></div>
+      </div>
+      <div style="margin-top:10px;"><label>本文</label><textarea id="outContent" style="min-height:360px;">${esc(o.content)}</textarea></div>
+    `, () => {
+      if (!val('outTitle').trim()) { toast('タイトルが必要です'); return false; }
+      const obj = {
+        id: id || uid('output'),
+        title: val('outTitle').trim(),
+        category: val('outCategory').trim(),
+        status: val('outStatus'),
+        content: val('outContent'),
+        createdAt: o.createdAt || nowText(),
+        updatedAt: nowText()
+      };
+      if (id) p.outputs = p.outputs.map(x => x.id === id ? obj : x);
+      else p.outputs.push(obj);
+      saveState(); renderContent(); toast('出力を保存しました'); return true;
+    });
+  }
+
+  function deleteOutput(id){
+    if (!confirm('この出力履歴を削除しますか？')) return;
+    const p = getProject();
+    p.outputs = p.outputs.filter(o => o.id !== id);
+    saveState(); renderContent(); toast('出力を削除しました');
+  }
+
+  function promoteOutput(id){
+    const p = getProject();
+    const o = p.outputs.find(x => x.id === id);
+    if (!o) return;
+    p.documents.push({
+      id: uid('doc'),
+      title: o.title + '（資料化）',
+      category: o.category || '出力資料',
+      status: o.status || '作業稿',
+      scope: 'GM用',
+      tags: '出力履歴から資料化',
+      content: o.content || '',
+      updatedAt: nowText()
+    });
+    saveState(); renderContent(); toast('資料に追加しました');
+  }
+
+  function options(list, selected){
+    return list.map(x => `<option value="${esc(x)}" ${x === selected ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  }
+
+  function extractVars(pr){
+    const fromTemplate = [...String(pr.template || '').matchAll(/\{\{([^{}]+)\}\}/g)].map(m => m[1].trim()).filter(Boolean);
+    const fromFields = String(pr.fields || '').split(',').map(x => x.trim()).filter(Boolean);
+    return [...new Set([...fromFields, ...fromTemplate])];
+  }
+
+  function setupGenerator(){
+    const p = getProject();
+    const stepId = document.getElementById('genStepSelect')?.value || '';
+    const step = p.steps.find(s => s.id === stepId);
+    const promptSelect = document.getElementById('genPromptSelect');
+    if (step && step.promptId && p.prompts.some(pr => pr.id === step.promptId)) {
+      promptSelect.value = step.promptId;
+    }
+    const pr = p.prompts.find(x => x.id === promptSelect.value) || p.prompts[0];
+    const vars = pr ? extractVars(pr) : [];
+    const fieldsEl = document.getElementById('genFields');
+    fieldsEl.innerHTML = vars.map(v => `
+      <div>
+        <label>${esc(v)}</label>
+        <textarea class="genField" data-key="${esc(v)}" placeholder="${esc(v)}を入力">${defaultFieldValue(v, p)}</textarea>
+      </div>
+    `).join('') || '<div class="muted small">このプロンプトに変数はありません。</div>';
+
+    const docChecks = document.getElementById('genDocChecks');
+    const selectedDocIds = step ? (step.docIds || []) : [];
+    docChecks.innerHTML = p.documents.map(d => `
+      <label class="checkbox-row">
+        <input type="checkbox" class="genDocCheck" value="${d.id}" ${selectedDocIds.includes(d.id) ? 'checked' : ''}>
+        <span>${esc(d.title)} <span class="muted small">/ ${esc(d.status || '')}</span></span>
+      </label>
+    `).join('') || '<div class="muted">資料がありません。</div>';
+  }
+
+  function defaultFieldValue(key, p){
+    const k = String(key);
+    if (k === 'システム') return esc(p.system || '');
+    if (k === 'ジャンル') return esc(p.genre || '');
+    if (k === '参照資料') return '※下部の「含める資料」で選択した資料が自動挿入されます。';
+    if (k === '前提・禁止事項') {
+      const docs = p.documents.filter(d => (d.tags||'').includes('禁止') || (d.title||'').includes('方針'));
+      return esc(docs.map(d => d.content).join('\n\n'));
+    }
+    return '';
+  }
+
+  function buildPrompt(){
+    const p = getProject();
+    const pr = p.prompts.find(x => x.id === document.getElementById('genPromptSelect').value);
+    if (!pr) { toast('プロンプトがありません'); return; }
+    const fields = {};
+    document.querySelectorAll('.genField').forEach(el => fields[el.dataset.key] = el.value);
+    const selectedDocs = [...document.querySelectorAll('.genDocCheck:checked')].map(x => p.documents.find(d => d.id === x.value)).filter(Boolean);
+    const refs = selectedDocs.map(d => {
+      return `\n\n==================================================\n# 参照資料：${d.title}\nカテゴリ：${d.category || '-'} / 状態：${d.status || '-'} / 公開範囲：${d.scope || '-'}\n==================================================\n${d.content || ''}`;
+    }).join('\n');
+    fields['参照資料'] = refs || fields['参照資料'] || 'なし';
+
+    let text = pr.template || '';
+    text = text.replace(/\{\{([^{}]+)\}\}/g, (_, key) => fields[key.trim()] ?? '');
+    currentGeneratedText = text;
+    document.getElementById('generatedText').value = text;
+    toast('プロンプトを生成しました');
+  }
+
+  async function copyGenerated(){
+    const txt = document.getElementById('generatedText')?.value || '';
+    if (!txt.trim()) { toast('コピーする内容がありません'); return; }
+    try {
+      await navigator.clipboard.writeText(txt);
+      toast('コピーしました');
+    } catch(e) {
+      const area = document.getElementById('generatedText');
+      area.focus(); area.select();
+      document.execCommand('copy');
+      toast('コピーしました');
+    }
+  }
+
+  function saveGeneratedAsOutput(){
+    const p = getProject();
+    const txt = document.getElementById('generatedText')?.value || '';
+    if (!txt.trim()) { toast('保存する内容がありません'); return; }
+    const title = prompt('出力履歴のタイトル', '生成プロンプト ' + nowText());
+    if (!title) return;
+    p.outputs.push({
+      id: uid('output'),
+      title,
+      category: '生成プロンプト',
+      status: '作業稿',
+      content: txt,
+      createdAt: nowText(),
+      updatedAt: nowText()
+    });
+    saveState(); toast('出力履歴に保存しました');
+  }
+
+  function exportJSON(){
+    saveState();
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const safe = (getProject()?.title || 'trpg').replace(/[\\/:*?"<>|]/g, '_');
+    a.href = url;
+    a.download = `${safe}_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('JSONを書き出しました');
+  }
+
+  function importJSON(e){
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(reader.result);
+        if (!imported.projects || !Array.isArray(imported.projects)) throw new Error('invalid');
+        if (!confirm('現在のデータをインポートデータで置き換えます。よろしいですか？')) return;
+        state = imported;
+        state.version = state.version || APP_VERSION;
+        saveState();
+        render();
+        toast('JSONを読み込みました');
+      } catch(err) {
+        alert('JSONの読み込みに失敗しました。形式を確認してください。');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  function resetAll(){
+    if (!confirm('本当に全データを初期化しますか？ JSONバックアップがない場合、元に戻せません。')) return;
+    if (!confirm('最終確認です。初期サンプル状態に戻します。')) return;
+    state = sampleState();
+    saveState();
+    render();
+    toast('初期化しました');
+  }
+
+  function addProject(){
+    const title = prompt('新しいプロジェクト名', '新規TRPGシナリオ');
+    if (!title) return;
+    const id = uid('project');
+    state.projects.push({
+      id, title, system:'', genre:'', status:'作業中', note:'',
+      documents:[], prompts:[], steps:[], outputs:[],
+      createdAt: nowText(), updatedAt: nowText()
+    });
+    state.currentProjectId = id;
+    saveState(); render(); toast('プロジェクトを追加しました');
+  }
+
+  function editProject(){
+    const p = getProject();
+    openModal('プロジェクト編集', `
+      <div class="form-grid">
+        <div><label>タイトル</label><input id="projTitle" value="${esc(p.title)}"></div>
+        <div><label>状態</label><select id="projStatus">${options(['構想中','作業中','レビュー中','完了','保留'], p.status)}</select></div>
+        <div><label>システム</label><input id="projSystem" value="${esc(p.system || '')}" placeholder="ソード・ワールド2.5など"></div>
+        <div><label>ジャンル</label><input id="projGenre" value="${esc(p.genre || '')}" placeholder="和風ダークファンタジーなど"></div>
+      </div>
+      <div style="margin-top:10px;"><label>メモ</label><textarea id="projNote">${esc(p.note || '')}</textarea></div>
+    `, () => {
+      if (!val('projTitle').trim()) { toast('タイトルが必要です'); return false; }
+      p.title = val('projTitle').trim();
+      p.status = val('projStatus');
+      p.system = val('projSystem');
+      p.genre = val('projGenre');
+      p.note = val('projNote');
+      saveState(); render(); toast('プロジェクトを保存しました'); return true;
+    });
+  }
+
+  function duplicateProject(){
+    const p = getProject();
+    const clone = JSON.parse(JSON.stringify(p));
+    clone.id = uid('project');
+    clone.title = p.title + ' のコピー';
+    clone.createdAt = nowText();
+    clone.updatedAt = nowText();
+    state.projects.push(clone);
+    state.currentProjectId = clone.id;
+    saveState(); render(); toast('プロジェクトを複製しました');
+  }
+
+  function deleteProject(){
+    const p = getProject();
+    if (state.projects.length <= 1) { toast('最後のプロジェクトは削除できません'); return; }
+    if (!confirm(`プロジェクト「${p.title}」を削除しますか？`)) return;
+    state.projects = state.projects.filter(x => x.id !== p.id);
+    state.currentProjectId = state.projects[0].id;
+    saveState(); render(); toast('プロジェクトを削除しました');
+  }
+
+  document.getElementById('addProjectBtn').addEventListener('click', addProject);
+  document.getElementById('renameProjectBtn').addEventListener('click', editProject);
+  document.getElementById('duplicateProjectBtn').addEventListener('click', duplicateProject);
+  document.getElementById('deleteProjectBtn').addEventListener('click', deleteProject);
+  document.getElementById('quickExportBtn').addEventListener('click', exportJSON);
+  document.getElementById('quickImportInput').addEventListener('change', importJSON);
+
+  render();
+})();
+</script>
+</body>
+</html>
